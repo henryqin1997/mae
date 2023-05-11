@@ -102,6 +102,7 @@ def get_args_parser():
     parser.add_argument('--dist_on_itp', action='store_true')
     parser.add_argument('--dist_url', default='env://',
                         help='url used to set up distributed training')
+    parser.add_argument('--info_momentum', default=0.5, type=float, help='InfoBatch Momentum')
 
     return parser
 
@@ -130,7 +131,8 @@ def main(args):
     dataset_train = datasets.ImageFolder(os.path.join(args.data_path, 'train'), transform=transform_train)
     print(dataset_train)
 
-    dataset_train = InfoBatch(dataset_train, num_epoch = args.epochs-args.start_epoch, delta = 1-0.125*args.epochs/(args.epochs-args.start_epoch))
+    dataset_train = InfoBatch(dataset_train, num_epoch = args.epochs-args.start_epoch, momentum = args.info_momentum,
+                    delta = 1-0.125*args.epochs/(args.epochs-args.start_epoch))
 
     if True:  # args.distributed:
         num_tasks = misc.get_world_size()

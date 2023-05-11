@@ -20,13 +20,13 @@ from operator import itemgetter
 from typing import Iterator, List, Optional, Union
 
 class InfoBatch(Dataset):
-    def __init__(self, dataset, ratio = 0.5, momentum = 0.8, num_epoch=None, delta = 0.875):
+    def __init__(self, dataset, ratio = 0.5, momentum = 0.5, num_epoch=None, delta = 0.875):
         self.dataset = dataset
         self.ratio = ratio
         self.momentum = momentum
         self.num_epoch = num_epoch
         self.delta = delta
-        self.scores = np.full([len(self.dataset)],100)
+        self.scores = np.full([len(self.dataset)],0)
         self.weights = np.ones(len(self.dataset))
         self.save_num = 0
 #         for k in dataset.__dict__.keys()-self.__dict__.keys():
