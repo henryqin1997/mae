@@ -32,7 +32,9 @@ from util.misc import NativeScalerWithGradNormCount as NativeScaler
 
 import models_mae
 
-from engine_pretrain import train_one_epoch
+from engine_pretrain_infobatch import train_one_epoch
+
+from infobatch import *
 
 
 def get_args_parser():
@@ -128,15 +130,19 @@ def main(args):
     dataset_train = datasets.ImageFolder(os.path.join(args.data_path, 'train'), transform=transform_train)
     print(dataset_train)
 
+    dataset_train = InfoBatch(dataset_train, num_epoch = args.epochs-args.start_epoch, delta = 1-0.125*args.epochs/(args.epochs-args.start_epoch))
+
     if True:  # args.distributed:
         num_tasks = misc.get_world_size()
         global_rank = misc.get_rank()
-        sampler_train = torch.utils.data.DistributedSampler(
-            dataset_train, num_replicas=num_tasks, rank=global_rank, shuffle=True
-        )
+#         sampler_train = torch.utils.data.DistributedSampler(
+#             dataset_train, num_replicas=num_tasks, rank=global_rank, shuffle=True
+#         )
+        sampler_train = DistributedSamplerWrapper(dataset_train.pruning_sampler(),num_tasks,rank,shuffle=False)
         print("Sampler_train = %s" % str(sampler_train))
     else:
-        sampler_train = torch.utils.data.RandomSampler(dataset_train)
+#         sampler_train = torch.utils.data.RandomSampler(dataset_train)
+        sampler_train = dataset_train.pruning_sampler()
 
     if global_rank == 0 and args.log_dir is not None:
         os.makedirs(args.log_dir, exist_ok=True)
@@ -151,7 +157,7 @@ def main(args):
         pin_memory=args.pin_mem,
         drop_last=True,
     )
-
+    
     # define the model
     model = models_mae.__dict__[args.model](norm_pix_loss=args.norm_pix_loss)
 
@@ -161,7 +167,7 @@ def main(args):
     print("Model = %s" % str(model_without_ddp))
 
     eff_batch_size = args.batch_size * args.accum_iter * misc.get_world_size()
-
+    
     if args.lr is None:  # only base_lr is specified
         args.lr = args.blr * eff_batch_size / 256
 
@@ -174,7 +180,7 @@ def main(args):
     if args.distributed:
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=True)
         model_without_ddp = model.module
-
+    
     # following timm: set wd as 0 for bias and norm layers
     param_groups = optim_factory.add_weight_decay(model_without_ddp, args.weight_decay)
     optimizer = torch.optim.AdamW(param_groups, lr=args.lr, betas=(0.9, 0.95))
