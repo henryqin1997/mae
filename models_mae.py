@@ -242,7 +242,7 @@ class MaskedAutoencoderViT(nn.Module):
         loss = self.forward_loss(imgs, pred, mask)
         return loss, pred, mask
 
-    def forward_infobatch(self, imgs, mask_ratio=0.75, weights)
+    def forward_infobatch(self, imgs, mask_ratio=0.75, weights=None)
         latent, mask, ids_restore = self.forward_encoder(imgs, mask_ratio)
         pred = self.forward_decoder(latent, ids_restore)  # [N, L, p*p*3]
         loss,scores = self.forward_loss_infobatch(imgs, pred, mask, weights)
