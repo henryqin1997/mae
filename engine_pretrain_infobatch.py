@@ -16,7 +16,7 @@ import torch
 
 import util.misc as misc
 import util.lr_sched as lr_sched
-
+from infobatch import *
 
 def train_one_epoch(model: torch.nn.Module,
                     data_loader: Iterable, optimizer: torch.optim.Optimizer,
