@@ -46,7 +46,7 @@ def train_one_epoch(model: torch.nn.Module,
         indices, weights = indices.to(device, non_blocking=True), weights.to(device, non_blocking=True)
 
         with torch.cuda.amp.autocast():
-            loss, _, _, scores = model.forward_infobatch(samples, mask_ratio=args.mask_ratio,weights)
+            loss, _, _, scores = model.forward_infobatch(samples, weights, mask_ratio=args.mask_ratio)
 
 
         trainset = data_loader.dataset
