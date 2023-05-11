@@ -57,7 +57,6 @@ def train_one_epoch(model: torch.nn.Module,
         indices_all = recombine_index(low_all,high_all)
         trainset.__setscore__(indices_all.detach().cpu().numpy(), scores_all.detach().cpu().numpy())
 
-
         loss_value = loss.item()
 
         if not math.isfinite(loss_value):
