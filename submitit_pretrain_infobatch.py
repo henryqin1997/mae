@@ -85,6 +85,7 @@ class Trainer(object):
 
 def main():
     args = parse_args()
+    print(args.job_dir)
     if args.job_dir == "":
         args.job_dir = get_shared_folder() / "%j"
 
