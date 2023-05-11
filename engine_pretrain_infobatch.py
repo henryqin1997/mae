@@ -48,6 +48,8 @@ def train_one_epoch(model: torch.nn.Module,
         with torch.cuda.amp.autocast():
             loss, _, _, scores = model(samples, weights, mask_ratio=args.mask_ratio)
 
+        print(loss)
+        print(score)
 
         trainset = data_loader.dataset
         low,high = split_index(indices)
