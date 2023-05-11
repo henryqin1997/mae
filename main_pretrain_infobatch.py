@@ -138,7 +138,7 @@ def main(args):
 #         sampler_train = torch.utils.data.DistributedSampler(
 #             dataset_train, num_replicas=num_tasks, rank=global_rank, shuffle=True
 #         )
-        sampler_train = DistributedSamplerWrapper(dataset_train.pruning_sampler(),num_tasks,rank,shuffle=False)
+        sampler_train = DistributedSamplerWrapper(dataset_train.pruning_sampler(),num_tasks,global_rank,shuffle=False)
         print("Sampler_train = %s" % str(sampler_train))
     else:
 #         sampler_train = torch.utils.data.RandomSampler(dataset_train)
