@@ -214,7 +214,7 @@ class MaskedAutoencoderViT(nn.Module):
         with torch.no_grad():
             scores = (loss * mask).sum(1)/mask.sum(1)
 
-        loss = (loss * mask).sum() / mask.sum()  # mean loss on removed patches
+        loss = (loss * mask * weights).sum() / mask.sum()  # mean loss on removed patches
         return loss, scores
 
     def forward_loss_infobatch_max(self, imgs, pred, mask, weights):
@@ -236,7 +236,7 @@ class MaskedAutoencoderViT(nn.Module):
         with torch.no_grad():
             scores = (loss * mask).max(1)[0]
 
-        loss = (loss * mask).sum() / mask.sum()  # mean loss on removed patches
+        loss = (loss * mask * weights).sum() / mask.sum()  # mean loss on removed patches
         return loss, scores
 
     def forward(self, imgs, weights, mask_ratio=0.75, mode='mean'):
