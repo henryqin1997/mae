@@ -214,6 +214,8 @@ class MaskedAutoencoderViT(nn.Module):
         with torch.no_grad():
             scores = (loss * mask).sum(1)/mask.sum(1)
 
+        print(scores)
+
         loss = (loss * mask * weights).sum() / mask.sum()  # mean loss on removed patches
         return loss, scores
 
